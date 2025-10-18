@@ -1,0 +1,16 @@
+[project]
+name = "djinni-salary-back"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.0",
+    "beautifulsoup4>=4.14.2",
+    "fastapi>=0.119.0",
+    "psycopg2>=2.9.11",
+    "pydantic>=2.12.3",
+    "requests>=2.32.5",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.37.0",
+]

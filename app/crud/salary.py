@@ -36,4 +36,4 @@ class VacancyCrud:
         session.add(vacancy)
         session.commit()
         session.refresh(vacancy)
-        return company
+        return vacancy

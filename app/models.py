@@ -21,9 +21,6 @@ class Company(Base):
     vacancies: Mapped[List["Vacancy"]] = relationship(
         back_populates="company", cascade="all, delete-orphan", default_factory=list
     )
-    probes: Mapped[List["SlaryProbe"]] = relationship(
-        back_populates="company", cascade="all, delete-orphan", default_factory=list
-    )
 
 
 class Vacancy(Base):
@@ -41,15 +38,6 @@ class Vacancy(Base):
     salary: Mapped[int] = mapped_column(
         Integer(), nullable=False, server_default="0", default=0
     )
-
-
-class SlaryProbe(Base):
-    __tablename__ = "salary_probes"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"))
-    salary_from: Mapped[int] = mapped_column(Integer())
-    started_dt: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+    salary_dt: Mapped[datetime | None] = mapped_column(
+        DateTime(), nullable=True, default=None
     )
-
-    company: Mapped["Company"] = relationship(back_populates="probes")

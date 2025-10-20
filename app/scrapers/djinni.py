@@ -2,10 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from typing import Set, Tuple
+import logging
+
+logger = logging.getLogger("app")
 
 DJINNI_HOST = "https://djinni.co"
 NEXT_PAGE_SELECTOR = 'a:has(span.bi-chevron-right):not([aria-disabled="True"])'
 VACANCY_TITLE_SELECTOR = "div.job-post-page > header > h1"
+VACANCY_LINK_SELECTOR = "a.job-item__title-link"
 
 
 def check_if_vacancy_active(vacancy_url: str) -> bool:
@@ -25,11 +29,11 @@ def vacancy_links_for_company(
     params = {"company_id": djinni_id, "salary": starting_salary, "page": "1"}
     has_next_page = True
     while has_next_page:
-        print(f"Requesting djinni with params {params}")
+        logger.info(f"Requesting djinni jobs with params {params}")
         response = requests.get(url, params=params)
         page = response.text
         soup = BeautifulSoup(page, "lxml")
-        anchors = soup.select("a.job-item__title-link")
+        anchors = soup.select(VACANCY_LINK_SELECTOR)
         page_links = {urljoin(DJINNI_HOST, anchor["href"]) for anchor in anchors}
         links.update(page_links)
         page_number = _next_page(soup)

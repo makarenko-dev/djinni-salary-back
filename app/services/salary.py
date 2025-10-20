@@ -4,7 +4,12 @@ from app.models import Vacancy, Company
 from typing import Set, Dict, List
 
 import time
+from datetime import datetime, timezone
 from app.scrapers import djinni
+
+import logging
+
+logger = logging.getLogger("app")
 
 MAX_ITERATONS = 10
 SALARY_STEP = 500
@@ -61,6 +66,7 @@ def _finalize_salaries(vacancies: Dict[str, Vacancy]):
             continue
         if (v.high_boundary - v.low_boundary) == SALARY_STEP:
             v.salary = v.low_boundary
+            v.salary_dt = datetime.now(timezone.utc)
 
 
 def _scrape_salary(session: Session, vacancy: Vacancy):
@@ -77,7 +83,7 @@ def _scrape_salary(session: Session, vacancy: Vacancy):
     }
     time.sleep(2)
     salary_filter = _middle_salary(vacancy.low_boundary, vacancy.high_boundary)
-    print(f"Starting with filter {salary_filter}")
+    logger.info(f"Starting salary filter {salary_filter}")
     for iteration in range(1, MAX_ITERATONS + 1):
         found_links, has_more = djinni.vacancy_links_for_company(
             vacancy.company.djinni_id, salary_filter, vacancy.url
@@ -85,17 +91,21 @@ def _scrape_salary(session: Session, vacancy: Vacancy):
         _update_low_boundary(
             vacancies, found_links, salary_filter, session, vacancy.company
         )
-        if target_link not in found_links:
+        target_found = target_link in found_links
+        if not target_found:
             _update_upper_boundary(vacancies, [target_link], salary_filter)
         if not has_more:
             gone_links = all_links - found_links
             _update_upper_boundary(vacancies, gone_links, salary_filter)
+        logger.info(
+            f"Iteration {iteration} gave {len(found_links)} links. Target present: {target_found}, has more pages: {has_more}"
+        )
         _finalize_salaries(vacancies)
         session.commit()
         target = vacancies[target_link]
         if target.salary:
-            print("Found salary")
+            logger.info("Salary found")
             return target.salary
         salary_filter = _middle_salary(target.low_boundary, target.high_boundary)
-        print(f"Setting filter {salary_filter}")
+        logger.info(f"Setting salary filter to {salary_filter}")
     return 0

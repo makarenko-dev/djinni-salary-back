@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class SalaryRequest(BaseModel):
     vacancy_url: str
-    company_id: int
+    company_name: str
 
 
 class SalaryResponse(BaseModel):

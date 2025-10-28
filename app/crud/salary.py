@@ -5,16 +5,16 @@ from app.models import Company, Vacancy
 
 class CompanyCrud:
     @staticmethod
-    def get_by_url(session: Session, company_id: int) -> Company | None:
-        stmt = select(Company).where(Company.djinni_id == company_id)
+    def get_by_url(session: Session, company_name: int) -> Company | None:
+        stmt = select(Company).where(Company.name == company_name)
         return session.scalar(stmt)
 
     @staticmethod
-    def get_or_create(session: Session, company_id: int) -> Company:
-        company = CompanyCrud.get_by_url(session, company_id)
+    def get_or_create(session: Session, company_name: int) -> Company:
+        company = CompanyCrud.get_by_url(session, company_name)
         if company:
             return company
-        company = Company(djinni_id=company_id)
+        company = Company(name=company_name)
         session.add(company)
         session.commit()
         session.refresh(company)

@@ -17,7 +17,8 @@ class Base(MappedAsDataclass, DeclarativeBase):
 class Company(Base):
     __tablename__ = "companies"
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    djinni_id: Mapped[int] = mapped_column(Integer())
+    name: Mapped[str] = mapped_column(String(150))
+    djinni_id: Mapped[int] = mapped_column(Integer(), nullable=True, default=None)
     vacancies: Mapped[List["Vacancy"]] = relationship(
         back_populates="company", cascade="all, delete-orphan", default_factory=list
     )

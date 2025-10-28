@@ -15,12 +15,14 @@ MAX_ITERATONS = 10
 SALARY_STEP = 500
 
 
-def salary_probe(session: Session, vacancy_url: str, company_id: int) -> int:
-    company = CompanyCrud.get_or_create(session, company_id)
+async def salary_probe(session: Session, vacancy_url: str, company_name: int) -> int:
+    logger.debug(f"Probing {vacancy_url}")
+    company = CompanyCrud.get_or_create(session, company_name)
     vacancy = VacancyCrud.get_or_create(session, vacancy_url, company)
     if vacancy.salary:
         return vacancy.salary
-    salary = _scrape_salary(session, vacancy)
+    logger.debug(f"Not found. Scraping salary")
+    salary = await _scrape_salary(session, vacancy)
     return salary
 
 
@@ -69,24 +71,24 @@ def _finalize_salaries(vacancies: Dict[str, Vacancy]):
             v.salary_dt = datetime.now(timezone.utc)
 
 
-def _scrape_salary(session: Session, vacancy: Vacancy):
-    is_active = djinni.check_if_vacancy_active(vacancy.url)
+async def _scrape_salary(session: Session, vacancy: Vacancy):
+    is_active = await djinni.check_if_vacancy_active(vacancy.url)
     if not is_active:
         return -1
-    all_links, _ = djinni.vacancy_links_for_company(
-        vacancy.company.djinni_id, 0, vacancy.url
+    all_links, _, company_id = await djinni.company_links_by_name(
+        vacancy.company.name, vacancy.url
     )
     target_link = vacancy.url
     vacancies: Dict[str, Vacancy] = {
         link: VacancyCrud.get_or_create(session, link, vacancy.company)
         for link in all_links
     }
-    time.sleep(2)
+    # time.sleep(2)
     salary_filter = _middle_salary(vacancy.low_boundary, vacancy.high_boundary)
     logger.info(f"Starting salary filter {salary_filter}")
     for iteration in range(1, MAX_ITERATONS + 1):
-        found_links, has_more = djinni.vacancy_links_for_company(
-            vacancy.company.djinni_id, salary_filter, vacancy.url
+        found_links, has_more, _ = await djinni.vacancy_links_by_id(
+            company_id, salary_filter, vacancy.url
         )
         _update_low_boundary(
             vacancies, found_links, salary_filter, session, vacancy.company
@@ -104,7 +106,6 @@ def _scrape_salary(session: Session, vacancy: Vacancy):
         session.commit()
         target = vacancies[target_link]
         if target.salary:
-            logger.info("Salary found")
             return target.salary
         salary_filter = _middle_salary(target.low_boundary, target.high_boundary)
         logger.info(f"Setting salary filter to {salary_filter}")

@@ -1,8 +1,15 @@
+networks:
+  web:
+    external: true
+  djinni-salary-network:
 services:
   djinni-salary:
     build: .
-    command: uv run -- uvicorn app.main:app
+    command: uv run -- uvicorn app.main:app --host 0.0.0.0 --port 8000
     expose:
       - "8000"
+    networks:
+      - web
+      - djinni-salary-network
     env_file:
       - ./.env

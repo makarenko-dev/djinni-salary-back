@@ -87,8 +87,7 @@ class SessionPool:
             self.proxies.append(proxy)
 
     def get_session(self):
-        # index = random.randint(0, len(self.proxies) - 1)
-        index = 0
+        index = random.randint(0, len(self.proxies) - 1)
         return self.sessions[index], self.proxies[index]
 
     async def warm_up(self, url):

@@ -2,10 +2,17 @@ networks:
   web:
     external: true
   djinni-salary-network:
+volumes:
+  djinni-salary-static:
+    name: djinni_salary_static
+    external: true
 services:
   djinni-salary:
     build: .
+    entrypoint: [ "/usr/src/app/entrypoint.sh" ]
     command: uv run -- uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - djinni-salary-static:/usr/src/app/app/staticfiles
     expose:
       - "8000"
     networks:

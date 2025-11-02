@@ -6,6 +6,7 @@ from .routers import salary
 
 from app.logging_config import configure_logging
 from app.scrapers import session_pool
+from app import settings
 
 configure_logging()
 
@@ -19,7 +20,10 @@ async def lifespan(app: FastAPI):
     await session_pool.SessionPool.instance().close()
 
 
-app = FastAPI(lifespan=lifespan)
+if settings.DEBUG:
+    app = FastAPI(lifespan=lifespan)
+else:
+    app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

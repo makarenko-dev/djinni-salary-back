@@ -12,3 +12,5 @@ wheels/
 test.db
 
 .env
+
+proxy.txt

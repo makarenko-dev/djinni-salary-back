@@ -1,0 +1,8 @@
+services:
+  djinni-salary:
+    build: .
+    command: uv run -- uvicorn app.main:app
+    expose:
+      - "8000"
+    env_file:
+      - ./.env

@@ -1,11 +1,10 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from typing import Set, Tuple, Dict
+from typing import Set, Tuple
 import logging
 import json
 import html
 from dataclasses import dataclass, field
-import time
 
 from .network import fetch_page_async
 
@@ -15,6 +14,7 @@ DJINNI_HOST = "https://djinni.co"
 NEXT_PAGE_SELECTOR = 'a:has(span.bi-chevron-right):not([aria-disabled="True"])'
 VACANCY_TITLE_SELECTOR = "div.job-post-page > header > h1"
 VACANCY_LINK_SELECTOR = "a.job-item__title-link"
+COMPANY_LINK_SELECTOR = 'a[data-analytics="company_page"].text-body'
 
 
 @dataclass
@@ -74,7 +74,7 @@ def _parse_listing_page(html_text: str) -> PageListing:
     anchors = soup.select(VACANCY_LINK_SELECTOR)
     page_links = {urljoin(DJINNI_HOST, anchor["href"]) for anchor in anchors}
     page_number = _next_page(soup)
-    company_link = soup.select_one('a[data-analytics="company_page"].text-body')
+    company_link = soup.select_one(COMPANY_LINK_SELECTOR)
     if company_link:
         company_json = json.loads(html.unescape(company_link["data-json-parameter"]))
         company_id = company_json["company_id"]

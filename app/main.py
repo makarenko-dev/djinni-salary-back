@@ -22,11 +22,13 @@ async def lifespan(app: FastAPI):
 
 if settings.DEBUG:
     app = FastAPI(lifespan=lifespan)
+    origins = ["*"]
 else:
     app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
+    origins = [settings.ALLOWED_ORIGIN]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[origins],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=False,

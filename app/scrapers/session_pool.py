@@ -4,6 +4,7 @@ import asyncio
 import random
 import logging
 import time
+from urllib.parse import urlparse
 from app.utils import measure_time
 
 logger = logging.getLogger("app")
@@ -74,6 +75,9 @@ class SessionPool:
         self.proxies: List[str] = []
 
     def pool_init(self, proxies: List[str]):
+        if len(self.sessions) > 0:
+            logger.warning("Trying to reinit proxies. Not supported yet")
+            return
         connector = aiohttp.TCPConnector(ttl_dns_cache=600, keepalive_timeout=120)
         if len(proxies) == 0:
             logger.warning("Initializing NO proxy mode")
@@ -83,8 +87,12 @@ class SessionPool:
             return
         for proxy in proxies:
             session = aiohttp.ClientSession(connector=connector, proxy=proxy)
+
             self.sessions.append(session)
             self.proxies.append(proxy)
+
+    def _ip_from_proxy(self, proxy) -> str:
+        return urlparse(proxy).hostname
 
     def get_session(self):
         index = random.randint(0, len(self.proxies) - 1)

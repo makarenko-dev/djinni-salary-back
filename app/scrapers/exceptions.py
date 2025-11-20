@@ -1,0 +1,2 @@
+class ScrapperUnavailableError(Exception):
+    pass

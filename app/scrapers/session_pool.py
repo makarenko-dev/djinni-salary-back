@@ -61,6 +61,10 @@ def add_tracing():
     return tc
 
 
+class NoSessionsError(Exception):
+    pass
+
+
 class SessionPool:
     _singletone: "SessionPool | None" = None
 
@@ -73,6 +77,12 @@ class SessionPool:
     def __init__(self):
         self.sessions: List[aiohttp.ClientSession] = []
         self.proxies: List[str] = []
+
+    async def mark_banned(self, proxy):
+        index = self.proxies.index(proxy)
+        del self.proxies[index]
+        await self.sessions[index].close()
+        del self.sessions[index]
 
     def pool_init(self, proxies: List[str]):
         if len(self.sessions) > 0:
@@ -95,6 +105,8 @@ class SessionPool:
         return urlparse(proxy).hostname
 
     def get_session(self):
+        if len(self.sessions) == 0:
+            raise NoSessionsError()
         index = random.randint(0, len(self.proxies) - 1)
         return self.sessions[index], self.proxies[index]
 

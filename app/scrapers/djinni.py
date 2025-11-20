@@ -4,6 +4,7 @@ from typing import Set, Tuple
 import logging
 import json
 import html
+
 from dataclasses import dataclass, field
 
 from .network import fetch_page_async

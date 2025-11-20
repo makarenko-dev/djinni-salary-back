@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import sentry_sdk
 
 from .routers import salary
 
 from app.logging_config import configure_logging
 from app.scrapers import session_pool
 from app import settings
+
 
 configure_logging()
 
@@ -33,4 +35,9 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=False,
 )
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        send_default_pii=True,
+    )
 app.include_router(salary.router, prefix="/api")

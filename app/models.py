@@ -34,7 +34,7 @@ class Vacancy(Base):
         Integer(), nullable=False, server_default="0", default=0
     )
     high_boundary: Mapped[int] = mapped_column(
-        Integer(), nullable=False, server_default="10000", default=10000
+        Integer(), nullable=False, server_default="10500", default=10500
     )
     salary: Mapped[int] = mapped_column(
         Integer(), nullable=False, server_default="0", default=0

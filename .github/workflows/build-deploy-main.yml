@@ -1,7 +1,7 @@
 permissions:
     contents: read
     packages: write
-name: main-build
+name: Build and deploy djinni-salary
 on:
     push:
         branches: [gh_actions]
@@ -25,3 +25,17 @@ jobs:
                   tags: |
                       ghcr.io/${{ github.repository_owner }}/djinni-salary:latest
                       ghcr.io/${{ github.repository_owner }}/djinni-salary:${{ github.sha }}
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Triger deploy via ssh
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{secrets.DEPLOY_HOST}}
+                  username: ${{secrets.DEPLOY_USER}}
+                  key: ${{secrets.DEPLOY_KEY}}
+                  script: |
+                      cd /home/ubuntu/djinni-salary-back
+                      docker compose pull djinni-salary
+                      docker compose up -d djinni-salary

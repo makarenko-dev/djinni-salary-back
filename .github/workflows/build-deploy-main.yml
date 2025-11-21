@@ -4,7 +4,7 @@ permissions:
 name: Build and deploy djinni-salary
 on:
     push:
-        branches: [gh_actions]
+        branches: [main]
 jobs:
     build:
         runs-on: ubuntu-latest

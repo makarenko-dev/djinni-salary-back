@@ -22,4 +22,6 @@ jobs:
               with:
                   context: .
                   push: true
-                  tags: makarenko-dev/djinni-salary:latest
+                  tags: |
+                      ghcr.io/${{ github.repository_owner }}/djinni-salary:latest
+                      ghcr.io/${{ github.repository_owner }}/djinni-salary:${{ github.sha }}

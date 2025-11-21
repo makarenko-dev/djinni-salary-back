@@ -8,11 +8,12 @@ volumes:
     external: true
 services:
   djinni-salary:
-    build: .
+    image: ghcr.io/makarenko-dev/djinni-salary:latest
     entrypoint: [ "/usr/src/app/entrypoint.sh" ]
     command: uv run -- uvicorn app.main:app --host 0.0.0.0 --port 8000
     volumes:
       - djinni-salary-static:/usr/src/app/app/staticfiles
+      - ./proxy.txt:/usr/src/app/proxy.txt:ro
     expose:
       - "8000"
     networks:

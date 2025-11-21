@@ -41,3 +41,8 @@ if settings.SENTRY_DSN:
         send_default_pii=True,
     )
 app.include_router(salary.router, prefix="/api")
+
+
+@app.get("/test")
+def test():
+    return {"hello": "world"}

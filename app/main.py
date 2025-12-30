@@ -35,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=False,
 )
-if settings.SENTRY_DSN:
+if settings.SENTRY_DSN and not settings.DEBUG:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         send_default_pii=True,

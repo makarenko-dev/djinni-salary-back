@@ -1,5 +1,4 @@
 from typing import Set, Tuple, Dict
-import time
 import sentry_sdk
 import logging
 import re
@@ -34,6 +33,8 @@ async def fetch_page_async(url: str, params: Dict[str, str] | None = None):
             logger.warning(f"No more sessions left")
             sentry_sdk.capture_message(f"No sessions left")
             break
+        except Exception as e:
+            logger.error(f"Proxy causing problem {proxy}")
     raise ScrapperUnavailableError()
 
 

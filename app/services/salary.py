@@ -4,6 +4,7 @@ from app.models import Vacancy, Company
 from typing import Set, Dict, List
 
 import time
+import asyncio
 from datetime import datetime, timezone
 from app.scrapers import djinni
 
@@ -14,6 +15,8 @@ logger = logging.getLogger("app")
 MAX_ITERATONS = 10
 SALARY_STEP = 500
 
+_scrape_semaphore = asyncio.Semaphore(3)
+
 
 async def salary_probe(session: Session, vacancy_url: str, company_name: int) -> int:
     logger.debug(f"Probing {vacancy_url}")
@@ -22,7 +25,8 @@ async def salary_probe(session: Session, vacancy_url: str, company_name: int) ->
     if vacancy.salary:
         return vacancy.salary
     logger.debug(f"Not found. Scraping salary")
-    salary = await _scrape_salary(session, vacancy)
+    async with _scrape_semaphore:
+        salary = await _scrape_salary(session, vacancy)
     return salary
 
 

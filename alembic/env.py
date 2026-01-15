@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.database import SQLALCHEMY_DATABASE_URL
+from app.settings import DB_URL
 from app.models import Base
 
 # this is the Alembic Config object, which provides
@@ -14,7 +14,7 @@ config = context.config
 
 # Inject DB URL if not set in alembic.ini
 if config.get_main_option("sqlalchemy.url") in (None, "", "driver://"):
-    config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+    config.set_main_option("sqlalchemy.url", DB_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

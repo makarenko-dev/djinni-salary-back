@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 from app.crud.salary import CompanyCrud, VacancyCrud
 from app.models import Vacancy, Company
-from typing import Set, Dict, List
+from typing import Dict, List
 
-import time
 import asyncio
 from datetime import datetime, timezone
 from app.scrapers import djinni

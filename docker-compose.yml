@@ -1,4 +1,6 @@
 networks:
+  db_network:
+    external: true
   web:
     external: true
   djinni-salary-network:
@@ -19,5 +21,6 @@ services:
     networks:
       - web
       - djinni-salary-network
+      - db_network
     env_file:
       - ./.env
